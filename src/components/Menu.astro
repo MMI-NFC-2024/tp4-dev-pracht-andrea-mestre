@@ -63,6 +63,24 @@ const currentPath = Astro.url.pathname;
                     🔍 Avec Filtres
                 </a>
             </li>
+            
+            <li>
+                <a 
+                    href="/penguinsFilters" 
+                    style={`
+                        color: ${currentPath === '/penguinsFilters' ? '#f39c12' : 'white'}; 
+                        text-decoration: none; 
+                        padding: 8px 15px; 
+                        border-radius: 5px; 
+                        background-color: ${currentPath === '/penguinsFilters' ? 'rgba(255,255,255,0.1)' : 'transparent'};
+                        transition: all 0.3s ease;
+                    `}
+                    onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                    onmouseout={`this.style.backgroundColor='${currentPath === '/penguinsFilters' ? 'rgba(255,255,255,0.1)' : 'transparent'}'`}
+                >
+                    🎛️ Filtres Avancés
+                </a>
+            </li>
         </ul>
         
         <p style="color: #bdc3c7; font-size: 0.9rem; margin: 15px 0 0 0;">

@@ -3,22 +3,66 @@ import Layout from "../layouts/Layout.astro";
 ---
 
 <Layout>
-    <h1 class="text-2xl">Test Astro et Plot (Observablehq)</h1>
+    <h1 class="text-2xl">Test Astro et Plot (Observablehq) - Filtre par espèce</h1>
+    <div class="mb-4">
+        <label for="species-select" class="block text-sm font-medium mb-2">Choisir une espèce :</label>
+        <select id="species-select" class="border border-gray-300 rounded px-3 py-2">
+            <option value="all">Toutes les espèces</option>
+            <option value="Adelie">Adelie</option>
+            <option value="Chinstrap">Chinstrap</option>
+            <option value="Gentoo">Gentoo</option>
+        </select>
+    </div>
+    
     <div id="myplot"></div>
+    
     <script>
         import * as Plot from "@observablehq/plot";
         import penguins from "../assets/penguins.json";
 
-        const plot = Plot.plot({
-            marks: [
-                Plot.dot(penguins, {
-                    x: "culmen_length_mm",
-                    y: "culmen_depth_mm",
-                    stroke: "species",
-                }),
-            ],
-        });
-        const div = document.querySelector("#myplot");
-        div.append(plot);
+        const selectSpecies = document.getElementById("species-select") as HTMLSelectElement;
+
+        
+        function renderPlot() {
+          
+            const species = selectSpecies?.value || "all";
+            const plotDiv = document.getElementById("myplot");
+        
+            if (!plotDiv) return;
+            
+           
+            plotDiv.innerHTML = "";
+            
+            
+            const filteredData = species === "all" ? penguins : penguins.filter(d => d.species === species);
+            
+    
+            const plot = Plot.plot({
+                marks: [
+                
+                    Plot.dot(filteredData, {
+                        x: "culmen_length_mm", 
+                        y: "culmen_depth_mm",  
+                        stroke: "species", 
+
+                
+                    }),
+                ],
+                marginLeft: 60,
+                marginBottom: 60,
+                x: {
+                    label: "Longueur du bec (mm)"
+                },
+                y: {
+                    label: "Profondeur du bec (mm)"
+                }
+            });
+            plotDiv.appendChild(plot);
+        }
+
+        if (selectSpecies) {
+            selectSpecies.addEventListener("change", renderPlot);
+        }
+        renderPlot();
     </script>
 </Layout>
