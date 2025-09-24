@@ -81,6 +81,24 @@ const currentPath = Astro.url.pathname;
                     🎛️ Filtres Avancés
                 </a>
             </li>
+            
+            <li>
+                <a 
+                    href="/cars" 
+                    style={`
+                        color: ${currentPath === '/cars' ? '#f39c12' : 'white'}; 
+                        text-decoration: none; 
+                        padding: 8px 15px; 
+                        border-radius: 5px; 
+                        background-color: ${currentPath === '/cars' ? 'rgba(255,255,255,0.1)' : 'transparent'};
+                        transition: all 0.3s ease;
+                    `}
+                    onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                    onmouseout={`this.style.backgroundColor='${currentPath === '/cars' ? 'rgba(255,255,255,0.1)' : 'transparent'}'`}
+                >
+                    🚗 Données Voitures
+                </a>
+            </li>
         </ul>
         
         <p style="color: #bdc3c7; font-size: 0.9rem; margin: 15px 0 0 0;">

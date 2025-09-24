@@ -1,0 +1,278 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Menu from "../components/Menu.astro";
+---
+
+<Layout>
+    <!-- En-tête de la page -->
+    <div class="max-w-6xl mx-auto px-6 py-8">
+        <div class="text-center mb-12">
+            <h1 class="text-4xl font-bold text-gray-800 mb-4">
+                🚗 Évolution de la Puissance des Voitures
+            </h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">
+                Découvrez l'évolution de la puissance des voitures américaines de 1970 à 1982
+            </p>
+        </div>
+
+        <!-- Filtres -->
+        <div class="bg-gray-50 rounded-lg p-6 mb-8">
+            <h2 class="text-lg font-semibold mb-4">Filtres</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <!-- Filtre par nombre de cylindres -->
+                <div>
+                    <label for="cylinders-select" class="block text-sm font-medium mb-2">
+                        Nombre de cylindres :
+                    </label>
+                    <select id="cylinders-select" class="w-full border border-gray-300 rounded px-3 py-2">
+                        <option value="all">Tous</option>
+                        <option value="4">4 cylindres</option>
+                        <option value="6">6 cylindres</option>
+                        <option value="8">8 cylindres</option>
+                    </select>
+                </div>
+                
+                <!-- Filtre par plage d'années -->
+                <div>
+                    <label for="year-select" class="block text-sm font-medium mb-2">
+                        Période :
+                    </label>
+                    <select id="year-select" class="w-full border border-gray-300 rounded px-3 py-2">
+                        <option value="all">Toutes les années</option>
+                        <option value="70-75">1970-1975</option>
+                        <option value="76-80">1976-1980</option>
+                        <option value="81-82">1981-1982</option>
+                    </select>
+                </div>
+            </div>
+            
+            <!-- Bouton de réinitialisation -->
+            <button id="reset-filters" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded transition-colors">
+                Réinitialiser les filtres
+            </button>
+        </div>
+
+        <!-- Conteneur principal du graphique -->
+        <div class="bg-white rounded-xl shadow-lg p-8 mb-8">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-2">
+                    Puissance vs Année
+                </h2>
+                <p class="text-gray-600" id="results-info">
+                    Chaque point représente une voiture
+                </p>
+            </div>
+            
+            <!-- Zone du graphique -->
+            <div id="myplot" class="flex justify-center items-center min-h-[500px]"></div>
+        </div>
+
+        <!-- Informations contextuelles -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-gradient-to-br from-red-50 to-red-100 rounded-lg p-6 border-l-4 border-red-400">
+                <h3 class="text-lg font-semibold text-red-800 mb-2">🏁 Années 70</h3>
+                <p class="text-red-700 text-sm">
+                    Période de transition avec des moteurs puissants mais confrontés 
+                    aux premiers chocs pétroliers.
+                </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-yellow-50 to-yellow-100 rounded-lg p-6 border-l-4 border-yellow-400">
+                <h3 class="text-lg font-semibold text-yellow-800 mb-2">⚡ Fin des 70s</h3>
+                <p class="text-yellow-700 text-sm">
+                    Réduction progressive de la puissance due aux nouvelles 
+                    réglementations environnementales.
+                </p>
+            </div>
+            
+            <div class="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-6 border-l-4 border-green-400">
+                <h3 class="text-lg font-semibold text-green-800 mb-2">🔧 Années 80</h3>
+                <p class="text-green-700 text-sm">
+                    Focus sur l'efficacité énergétique et les nouvelles technologies
+                    avec des moteurs plus petits mais optimisés.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        import * as Plot from "@observablehq/plot";
+        import cars from "../assets/cars.json";
+
+        // Récupération des éléments de contrôle
+        const selectCylinders = document.getElementById("cylinders-select") as HTMLSelectElement;
+        const selectYear = document.getElementById("year-select") as HTMLSelectElement;
+        const resetButton = document.getElementById("reset-filters") as HTMLButtonElement;
+
+        function renderPlot() {
+            const cylinders = selectCylinders?.value || "all";
+            const yearRange = selectYear?.value || "all";
+            const plotDiv = document.getElementById("myplot");
+
+            if (!plotDiv) return;
+
+            plotDiv.innerHTML = "";
+
+            // Filtrage des données
+            let filteredData = cars.filter((d) => {
+                // Filtrer les données avec des valeurs nulles
+                if (!d["power (hp)"] || !d.year) {
+                    return false;
+                }
+
+                // Appliquer les filtres
+                const cylindersMatch = cylinders === "all" || d.cylinders.toString() === cylinders;
+                
+                let yearMatch = true;
+                if (yearRange !== "all") {
+                    const year = parseInt("19" + d.year.toString().padStart(2, '0'));
+                    switch(yearRange) {
+                        case "70-75":
+                            yearMatch = year >= 1970 && year <= 1975;
+                            break;
+                        case "76-80":
+                            yearMatch = year >= 1976 && year <= 1980;
+                            break;
+                        case "81-82":
+                            yearMatch = year >= 1981 && year <= 1982;
+                            break;
+                    }
+                }
+
+                return cylindersMatch && yearMatch;
+            });
+
+            // Convertir les années au format complet
+            const dataWithFullYear = filteredData.map(d => ({
+                ...d,
+                fullYear: parseInt("19" + d.year.toString().padStart(2, '0'))
+            }));
+
+            // Mettre à jour les informations
+            updateResultsInfo(dataWithFullYear.length);
+
+            const plot = Plot.plot({
+                marks: [
+                    Plot.dot(dataWithFullYear, {
+                        x: "fullYear",
+                        y: "power (hp)",
+                        stroke: "cylinders",
+                        fill: "cylinders",
+                        fillOpacity: 0.6,
+                        r: 3,
+                        strokeWidth: 1
+                    }),
+                ],
+                marginLeft: 80,
+                marginBottom: 70,
+                marginTop: 40,
+                marginRight: 40,
+                width: 800,
+                height: 500,
+                x: {
+                    label: "Année",
+                    grid: true,
+                    domain: [1970, 1982],
+                    tickFormat: d => d.toString()
+                },
+                y: {
+                    label: "Puissance (ch)",
+                    grid: true,
+                    tickFormat: d => `${d} ch`
+                },
+                color: {
+                    legend: true,
+                    label: "Cylindres",
+                    domain: [3, 4, 5, 6, 8],
+                    range: ["#8b5cf6", "#06b6d4", "#10b981", "#f59e0b", "#ef4444"]
+                },
+                style: {
+                    fontSize: "14px",
+                    fontFamily: "system-ui, sans-serif"
+                }
+            });
+            
+            plotDiv.appendChild(plot);
+        }
+
+        function updateResultsInfo(count: number) {
+            const infoElement = document.getElementById("results-info");
+            if (infoElement) {
+                infoElement.textContent = `${count} voitures affichées`;
+            }
+        }
+
+        function resetFilters() {
+            if (selectCylinders) selectCylinders.value = "all";
+            if (selectYear) selectYear.value = "all";
+            renderPlot();
+        }
+
+        // Ajout des écouteurs d'événements
+        if (selectCylinders) {
+            selectCylinders.addEventListener("change", renderPlot);
+        }
+        if (selectYear) {
+            selectYear.addEventListener("change", renderPlot);
+        }
+        if (resetButton) {
+            resetButton.addEventListener("click", resetFilters);
+        }
+
+        // Affichage initial
+        renderPlot();
+    </script>
+
+    <style>
+        /* Animations et transitions */
+        .bg-white {
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .bg-white:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        select {
+            transition: border-color 0.3s ease;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        /* Style responsive pour le graphique */
+        #myplot svg {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Animations des cartes d'informations */
+        .grid > div {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .grid > div:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .max-w-6xl {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</Layout>
