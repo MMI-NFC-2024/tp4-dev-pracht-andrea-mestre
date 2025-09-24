@@ -4,6 +4,7 @@ import Menu from "../components/Menu.astro";
 ---
 
 <Layout>
+    
     <div class="max-w-6xl mx-auto px-6 py-8">
         <div class="text-center mb-12">
             <h1 class="text-4xl font-bold text-gray-800 mb-4">
@@ -70,7 +71,7 @@ import Menu from "../components/Menu.astro";
 
             const countElement = document.getElementById("total-count");
             if (countElement) {
-                countElement.textContent = validData.length;
+                countElement.textContent = validData.length.toString();
             }
 
             const plot = Plot.plot({
