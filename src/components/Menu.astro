@@ -1,0 +1,94 @@
+---
+// Récupère l'URL actuelle pour marquer la page active
+const currentPath = Astro.url.pathname;
+---
+
+<nav style="background-color: #2c3e50; padding: 15px 0; margin-bottom: 30px;">
+    <div style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+        <h2 style="color: white; margin: 0 0 15px 0; font-size: 1.5rem;">
+            🐧 Navigation Penguins Data
+        </h2>
+        
+        <ul style="list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 15px;">
+            <li>
+                <a 
+                    href="/" 
+                    style={`
+                        color: ${currentPath === '/' ? '#f39c12' : 'white'}; 
+                        text-decoration: none; 
+                        padding: 8px 15px; 
+                        border-radius: 5px; 
+                        background-color: ${currentPath === '/' ? 'rgba(255,255,255,0.1)' : 'transparent'};
+                        transition: all 0.3s ease;
+                    `}
+                    onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                    onmouseout={`this.style.backgroundColor='${currentPath === '/' ? 'rgba(255,255,255,0.1)' : 'transparent'}'`}
+                >
+                    🏠 Accueil
+                </a>
+            </li>
+            
+            <li>
+                <a 
+                    href="/simplePenguin" 
+                    style={`
+                        color: ${currentPath === '/simplePenguin' ? '#f39c12' : 'white'}; 
+                        text-decoration: none; 
+                        padding: 8px 15px; 
+                        border-radius: 5px; 
+                        background-color: ${currentPath === '/simplePenguin' ? 'rgba(255,255,255,0.1)' : 'transparent'};
+                        transition: all 0.3s ease;
+                    `}
+                    onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                    onmouseout={`this.style.backgroundColor='${currentPath === '/simplePenguin' ? 'rgba(255,255,255,0.1)' : 'transparent'}'`}
+                >
+                    📊 Graphique Simple
+                </a>
+            </li>
+            
+            <li>
+                <a 
+                    href="/penguinFilter" 
+                    style={`
+                        color: ${currentPath === '/penguinFilter' ? '#f39c12' : 'white'}; 
+                        text-decoration: none; 
+                        padding: 8px 15px; 
+                        border-radius: 5px; 
+                        background-color: ${currentPath === '/penguinFilter' ? 'rgba(255,255,255,0.1)' : 'transparent'};
+                        transition: all 0.3s ease;
+                    `}
+                    onmouseover="this.style.backgroundColor='rgba(255,255,255,0.1)'"
+                    onmouseout={`this.style.backgroundColor='${currentPath === '/penguinFilter' ? 'rgba(255,255,255,0.1)' : 'transparent'}'`}
+                >
+                    🔍 Avec Filtres
+                </a>
+            </li>
+        </ul>
+        
+        <p style="color: #bdc3c7; font-size: 0.9rem; margin: 15px 0 0 0;">
+            Explorez les données des penguins avec différentes visualisations
+        </p>
+    </div>
+</nav>
+
+<style>
+    nav a:hover {
+        transform: translateY(-1px);
+    }
+    
+    @media (max-width: 768px) {
+        nav ul {
+            flex-direction: column;
+        }
+        
+        nav li {
+            width: 100%;
+        }
+        
+        nav a {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+    }
+</style>
